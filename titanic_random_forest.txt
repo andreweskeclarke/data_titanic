@@ -1,0 +1,16 @@
+library(zoo)
+library(randomForest)
+trainData <- read.csv('/Users/Thoughtworker/Documents/Kaggle/train.csv')
+trainData$age <- na.fill(trainData$age, 29.69912)
+selectedData <- data.frame(as.factor(trainData$survived), trainData$age, trainData$sex, trainData$sibsp, trainData$pclass, trainData$fare, trainData$embarked)
+colnames(selectedData) <- c("survived", "age", "sex", "sibsp", "pclass", "fare", "embarked")
+myRF <- randomForest(formula = survived ~ ., data = selectedData,      ntree = 5000)
+
+test <- read.csv('/Users/Thoughtworker/Documents/Kaggle/test.csv')
+test$age <- na.fill(test$age, 29.69912)
+test$fare <- na.fill(test$fare, 0.00)
+test <- data.frame(as.factor(sample(0:1,418,replace=T)), test$age, test$sex, test$sibsp, test$pclass, test$fare, test$embarked)
+colnames(test) <- c("survived", "age", "sex", "sibsp", "pclass", "fare", "embarked")
+predicted <- predict(myRF, test)
+
+predictedOnOriginal <- predict(myRF, selectedData)
